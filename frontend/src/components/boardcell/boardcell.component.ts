@@ -1,5 +1,6 @@
 import { Component, Input } from '@angular/core';
 import { NgClass } from '@angular/common';
+import { BoardCell } from './cell.model';
 
 @Component({
   selector: 'app-boardcell',
@@ -9,7 +10,7 @@ import { NgClass } from '@angular/common';
   styleUrl: './boardcell.component.css'
 })
 export class BoardcellComponent {
-  @Input({ required: true, alias: 'light' })
-  isLight!: boolean;
+  @Input({ required: true })
+  cell!: BoardCell;
 
 }

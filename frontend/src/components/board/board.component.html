@@ -1,5 +1,5 @@
 <div class="h-full grid grid-cols-8">
   @for (cell of cells; track cell) {
-    <app-boardcell [light]="cell.color"></app-boardcell>
+    <app-boardcell [cell]="cell"></app-boardcell>
   }
 </div>
