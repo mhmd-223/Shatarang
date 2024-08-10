@@ -13,4 +13,9 @@ export class BoardcellComponent {
   @Input({ required: true })
   cell!: BoardCell;
 
+  getPiecePath(cell: BoardCell) {
+    const path = 'chess-pieces/Merida';
+
+    return `${path}/w-pawn.svg`
+  }
 }
