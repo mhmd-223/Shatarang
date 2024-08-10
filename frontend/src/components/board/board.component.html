@@ -1,0 +1,5 @@
+<div class="m-4 h-1/2 grid grid-cols-8">
+  @for (cell of cells; track cell) {
+    <app-boardcell [light]="cell.color"></app-boardcell>
+  }
+</div>
