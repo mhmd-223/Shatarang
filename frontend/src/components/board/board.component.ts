@@ -1,7 +1,7 @@
-import { Component } from '@angular/core';
+import { Component, inject, OnInit } from '@angular/core';
 import { BoardcellComponent } from "../boardcell/boardcell.component";
 import { BoardCell } from "../boardcell/cell.model";
-import { INITIAL_PIECES_SETUP } from "../boardcell/piece.model";
+import { BoardService } from './board.service';
 
 @Component({
   selector: 'app-board',
@@ -10,24 +10,14 @@ import { INITIAL_PIECES_SETUP } from "../boardcell/piece.model";
   templateUrl: './board.component.html',
   styleUrl: './board.component.css'
 })
-export class BoardComponent {
+export class BoardComponent implements OnInit {
   board: BoardCell[][] = [];
 
-  constructor() {
-    this.initBoard();
+  private boardService = inject(BoardService)
+
+
+  ngOnInit(): void {
+    this.board = this.boardService.board
+    this.boardService.movement$.subscribe((newBoard: BoardCell[][]) => this.board = newBoard);
   }
-
-  private initBoard(): void {
-    const BOARD_SIZE = 8;
-
-    this.board = Array.from({ length: BOARD_SIZE }, (_, row) =>
-      Array.from({ length: BOARD_SIZE }, (_, col) => {
-        const isLight = (row + col) % 2 === 0; // Determine color based on row and column
-        const piece = INITIAL_PIECES_SETUP[row]?.[col]; // Determine the initial piece
-
-        return new BoardCell(isLight, piece, { row, col });
-      })
-    );
-  }
-
 }
