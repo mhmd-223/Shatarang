@@ -1,12 +1,12 @@
 <div
   class="w-full h-full flex items-center justify-center hover:cursor-grab"
-  [ngClass]="{ light: cell.isLight, dark: !cell.isLight }"
+  [ngStyle]="getCellStyle(cell)"
   oncontextmenu="return false;"
   (click)="onClick()"
 >
   <img
     [src]="getPiecePath(cell)"
-    class="w-2/3 hover:cursor-grab"
+    class="w-3/4 hover:cursor-grab"
     [ngStyle]="{ visibility: cell.piece ? 'visable' : 'hidden' }"
   />
 </div>

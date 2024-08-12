@@ -2,6 +2,7 @@ import { Component, inject, Input } from '@angular/core';
 import { NgClass, NgStyle } from '@angular/common';
 import { BoardCell } from './cell.model';
 import { BoardService } from '../board/board.service';
+import { ThemeService } from '../../app/theme.service';
 
 @Component({
   selector: 'app-boardcell',
@@ -15,6 +16,7 @@ export class BoardcellComponent {
   cell!: BoardCell;
 
   private boardService = inject(BoardService)
+  private themeService = inject(ThemeService)
 
   getPiecePath(cell: BoardCell) {
     const path = 'chess-pieces/Merida';
@@ -24,7 +26,26 @@ export class BoardcellComponent {
     return `${path}/${color}-${name}.svg`
   }
 
+  getCellStyle(cell: BoardCell) {
+    const color = cell.isLight ? this.themeService.lightColor : this.themeService.darkColor
+    let backgroundColor;
+
+    if (cell.isClicked)
+      backgroundColor = this.themeService.markClicked(color);
+    else backgroundColor = color
+
+    if (cell.isLastMove)
+      backgroundColor = this.themeService.markLastMove(color);
+
+    return {
+      'background-color': backgroundColor
+    }
+  }
+
   onClick() {
+    if (this.cell.piece) {
+      this.cell.click();
+    }
     this.boardService.clickCell(this.cell)
   }
 }

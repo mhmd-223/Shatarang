@@ -51,6 +51,8 @@ export class BoardService {
 
     if (this.src && this.dest) {
       if (this.src !== this.dest) {
+        this._board.forEach(row => row.forEach(cell => cell.isLastMove = false))
+
         const srcPos = this.src.position;
         const destPos = this.dest.position;
 
@@ -59,13 +61,19 @@ export class BoardService {
         newBoard[destPos.row][destPos.col].piece = this.src.piece;
         newBoard[srcPos.row][srcPos.col].piece = undefined;
 
+        newBoard[destPos.row][destPos.col].isLastMove = true
+        newBoard[srcPos.row][srcPos.col].isLastMove = true
+
         // Update the BehaviorSubject with the new board state
         this._board = newBoard;
         this.boardSubject.next(this._board);
+
       }
+
       // Clean
       this.src = null;
       this.dest = null;
+      this._board.forEach(row => row.forEach(cell => cell.isClicked && cell.click())) // Unclick any clicked cell
     }
   }
 }
