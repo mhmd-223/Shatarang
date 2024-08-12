@@ -3,6 +3,7 @@ import { Piece } from "./piece.model";
 export class BoardCell {
   private _isClicked: boolean = false;
   private _isLastMove: boolean = false;
+  private _isClickable: boolean = true;
 
   constructor(
     public isLight: boolean,
@@ -24,6 +25,13 @@ export class BoardCell {
 
   set isLastMove(value: boolean) {
     this._isLastMove = value;
+  }
+
+  get isClickable(): boolean {
+    return this._isClickable;
+  }
+  set isClickable(value: boolean) {
+    this._isClickable = value;
   }
 }
 

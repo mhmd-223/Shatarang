@@ -1,4 +1,4 @@
-import { Injectable } from '@angular/core';
+import { effect, Injectable, signal, WritableSignal } from '@angular/core';
 import { BoardCell } from '../boardcell/cell.model';
 import { INITIAL_PIECES_SETUP } from '../boardcell/piece.model';
 import { BehaviorSubject } from 'rxjs';
@@ -15,10 +15,16 @@ export class BoardService {
   private boardSubject = new BehaviorSubject<BoardCell[][]>(this.initBoard());
   movement$ = this.boardSubject.asObservable();
 
+  private currentPlayer: WritableSignal<Player> = signal(Player.WHITE);
+
   constructor() {
     this._board = this.initBoard();
 
     this.boardSubject.next(this._board); // Emit the initial board state
+
+    effect(() => {
+      this._board.forEach(row => row.forEach(cell => cell.isClickable = cell.piece?.color.toString() == this.currentPlayer()))
+    })
   }
 
   private initBoard(): BoardCell[][] {
@@ -40,7 +46,7 @@ export class BoardService {
 
   clickCell(cell: BoardCell): void {
     if (!this.isMovementStarted) {
-      if (cell.piece) {
+      if (cell.piece && cell.isClickable) {
         this.isMovementStarted = true; // Start a move
         this.src = cell;
       }
@@ -67,7 +73,7 @@ export class BoardService {
         // Update the BehaviorSubject with the new board state
         this._board = newBoard;
         this.boardSubject.next(this._board);
-
+        this.currentPlayer.update(curr => curr === Player.WHITE ? Player.BLACK : Player.WHITE);
       }
 
       // Clean
@@ -76,4 +82,9 @@ export class BoardService {
       this._board.forEach(row => row.forEach(cell => cell.isClicked && cell.click())) // Unclick any clicked cell
     }
   }
+}
+
+enum Player {
+  WHITE = 'w',
+  BLACK = 'b'
 }

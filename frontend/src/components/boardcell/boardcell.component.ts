@@ -43,7 +43,7 @@ export class BoardcellComponent {
   }
 
   onClick() {
-    if (this.cell.piece) {
+    if (this.cell.piece && this.cell.isClickable) {
       this.cell.click();
     }
     this.boardService.clickCell(this.cell)
