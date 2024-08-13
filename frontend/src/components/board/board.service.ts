@@ -51,36 +51,38 @@ export class BoardService {
         this.src = cell;
       }
     } else {
-      this.dest = cell;
-      this.isMovementStarted = false; // End the move
-    }
+      if (cell.piece?.color !== this.src?.piece?.color)
+        this.dest = cell;
 
-    if (this.src && this.dest) {
-      if (this.src !== this.dest) {
-        this._board.forEach(row => row.forEach(cell => cell.isLastMove = false))
-
-        const srcPos = this.src.position;
-        const destPos = this.dest.position;
-
-        // Update the board state
-        const newBoard = this._board.map(row => row.slice()); // Create a new board array
-        newBoard[destPos.row][destPos.col].piece = this.src.piece;
-        newBoard[srcPos.row][srcPos.col].piece = undefined;
-
-        newBoard[destPos.row][destPos.col].isLastMove = true
-        newBoard[srcPos.row][srcPos.col].isLastMove = true
-
-        // Update the BehaviorSubject with the new board state
-        this._board = newBoard;
-        this.boardSubject.next(this._board);
+      if (this.src && this.dest && this.src !== this.dest) {
+        this.processMove();
         this.currentPlayer.update(curr => curr === Player.WHITE ? Player.BLACK : Player.WHITE);
       }
 
-      // Clean
+      // Reset source and destination
       this.src = null;
       this.dest = null;
-      this._board.forEach(row => row.forEach(cell => cell.isClicked && cell.click())) // Unclick any clicked cell
+      this.isMovementStarted = false; // End the move
+      this._board.forEach(row => row.forEach(cell => cell.isClicked && cell.click()));
     }
+  }
+
+  private processMove(): void {
+    // Reset last move
+    this._board.forEach(row => row.forEach(cell => cell.isLastMove = false));
+
+    const srcPos = this.src!.position;
+    const destPos = this.dest!.position;
+
+    const newBoard = this._board.map(row => row.slice());
+    newBoard[destPos.row][destPos.col].piece = this.src!.piece;
+    newBoard[srcPos.row][srcPos.col].piece = undefined;
+
+    newBoard[destPos.row][destPos.col].isLastMove = true;
+    newBoard[srcPos.row][srcPos.col].isLastMove = true;
+
+    this._board = newBoard;
+    this.boardSubject.next(this._board);
   }
 }
 
