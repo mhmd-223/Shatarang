@@ -1,6 +1,6 @@
 import { NgClass } from '@angular/common';
 import { Component, inject, Input, OnInit } from '@angular/core';
-import { ClockService } from './clock.service';
+import { ClockService } from '@services/clock.service';
 
 @Component({
   selector: 'app-clock',

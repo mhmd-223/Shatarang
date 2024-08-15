@@ -1,8 +1,8 @@
 import { Component, inject, Input } from '@angular/core';
 import { NgClass, NgStyle } from '@angular/common';
-import { BoardCell } from './cell.model';
-import { BoardService } from '../board/board.service';
-import { ThemeService } from '../../app/theme.service';
+import { BoardCell } from '@models/cell.model';
+import { BoardService } from '@services/board.service';
+import { ThemeService } from '@services/theme.service';
 
 @Component({
   selector: 'app-boardcell',

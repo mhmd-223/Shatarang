@@ -1,7 +1,7 @@
 import { Component, inject, OnInit } from '@angular/core';
 import { BoardcellComponent } from "../boardcell/boardcell.component";
-import { BoardCell } from "../boardcell/cell.model";
-import { BoardService } from './board.service';
+import { BoardCell } from "@models/cell.model";
+import { BoardService } from '@services/board.service';
 
 @Component({
   selector: 'app-board',

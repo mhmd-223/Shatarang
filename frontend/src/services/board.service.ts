@@ -1,6 +1,6 @@
 import { effect, Injectable, signal, WritableSignal } from '@angular/core';
-import { BoardCell } from '../boardcell/cell.model';
-import { INITIAL_PIECES_SETUP } from '../boardcell/piece.model';
+import { BoardCell } from '@models/cell.model';
+import { INITIAL_PIECES_SETUP } from '@models/piece.model';
 import { BehaviorSubject } from 'rxjs';
 
 @Injectable({
