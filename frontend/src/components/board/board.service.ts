@@ -15,7 +15,7 @@ export class BoardService {
   private boardSubject = new BehaviorSubject<BoardCell[][]>(this.initBoard());
   movement$ = this.boardSubject.asObservable();
 
-  private currentPlayer: WritableSignal<Player> = signal(Player.WHITE);
+  private _currentPlayer: WritableSignal<Player> = signal(Player.WHITE);
 
   constructor() {
     this._board = this.initBoard();
@@ -23,7 +23,7 @@ export class BoardService {
     this.boardSubject.next(this._board); // Emit the initial board state
 
     effect(() => {
-      this._board.forEach(row => row.forEach(cell => cell.isClickable = cell.piece?.color.toString() == this.currentPlayer()))
+      this._board.forEach(row => row.forEach(cell => cell.isClickable = cell.piece?.color.toString() == this._currentPlayer()))
     })
   }
 
@@ -44,6 +44,10 @@ export class BoardService {
     return this._board;
   }
 
+  get currentPlayer() {
+    return this._currentPlayer()
+  }
+
   clickCell(cell: BoardCell): void {
     if (!this.isMovementStarted) {
       if (cell.piece && cell.isClickable) {
@@ -56,7 +60,7 @@ export class BoardService {
 
       if (this.src && this.dest && this.src !== this.dest) {
         this.processMove();
-        this.currentPlayer.update(curr => curr === Player.WHITE ? Player.BLACK : Player.WHITE);
+        this._currentPlayer.update(curr => curr === Player.WHITE ? Player.BLACK : Player.WHITE);
       }
 
       // Reset source and destination
