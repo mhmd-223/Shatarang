@@ -1,4 +1,4 @@
-import { Piece } from "./piece.model";
+import { Piece } from "./pieces/piece.model";
 
 export class BoardCell {
   private _isClicked: boolean = false;

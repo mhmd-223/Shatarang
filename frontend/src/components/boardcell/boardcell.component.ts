@@ -19,11 +19,7 @@ export class BoardcellComponent {
   private themeService = inject(ThemeService)
 
   getPiecePath(cell: BoardCell) {
-    const path = 'chess-pieces/Merida';
-    const color = cell.piece?.color ?? 'w';
-    const name = cell.piece?.name ?? 'pawn';
-
-    return `${path}/${color}-${name}.svg`
+    return this.themeService.getPiecePath(cell);
   }
 
   getCellStyle(cell: BoardCell) {

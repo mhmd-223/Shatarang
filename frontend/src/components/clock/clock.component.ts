@@ -1,5 +1,6 @@
 import { NgClass } from '@angular/common';
 import { Component, inject, Input, OnInit } from '@angular/core';
+import { Clock } from '@models/clock.model';
 import { ClockService } from '@services/clock.service';
 
 @Component({
@@ -14,7 +15,7 @@ export class ClockComponent implements OnInit {
   player!: string
 
   private clockService = inject(ClockService)
-  private clock: any;
+  private clock!: Clock;
 
   ngOnInit(): void {
     this.clock = this.clockService.getClock(this.player);
