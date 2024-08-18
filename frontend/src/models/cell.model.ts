@@ -1,9 +1,11 @@
+import { CellPosition } from "@shared/position";
 import { Piece } from "./pieces/piece.model";
 
 export class BoardCell {
   private _isClicked: boolean = false;
   private _isLastMove: boolean = false;
   private _isClickable: boolean = true;
+  private _isLegal: boolean = false;
 
   constructor(
     public isLight: boolean,
@@ -30,12 +32,16 @@ export class BoardCell {
   get isClickable(): boolean {
     return this._isClickable;
   }
+
   set isClickable(value: boolean) {
     this._isClickable = value;
   }
-}
 
-interface CellPosition {
-  row: number,
-  col: number
+  get isLegal(): boolean {
+    return this._isLegal;
+  }
+
+  set isLegal(value: boolean) {
+    this._isLegal = value;
+  }
 }

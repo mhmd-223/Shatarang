@@ -1,18 +1,44 @@
-import { Color } from "@shared/color";
-import { PieceName } from "@shared/piecename";
+import { BoardCell } from '@models/cell.model'
+import { Color } from '@shared/color'
+import { PieceName } from '@shared/piecename'
+import { CellPosition } from '@shared/position'
 
-export class Piece {
-  constructor(
+export abstract class Piece {
+  protected directions: CellPosition[] = []
+  private readonly BOARD_SIZE = 8
+
+  protected constructor(
     public readonly color: Color,
-    public readonly name: PieceName
+    public readonly name: PieceName,
+    private readonly strategy: MoveStrategy
   ) { }
+
+  abstract calculatePossibleMoves(position: CellPosition): CellPosition[]
+
+  protected isValidPos(pos: CellPosition) {
+    const { row, col } = pos
+
+    return (
+      row >= 0 && row < this.BOARD_SIZE && col >= 0 && col < this.BOARD_SIZE
+    )
+  }
+
+  applyConstrains() { }
+
+  validate(from: CellPosition, to: CellPosition, board: BoardCell[][]): boolean {
+    return this.strategy.isLegalMove(from, to, board);
+  }
 }
 
-const backrank = [PieceName.ROOK, PieceName.KNIGHT, PieceName.BISHOP, PieceName.QUEEN, PieceName.KING, PieceName.BISHOP, PieceName.KNIGHT, PieceName.ROOK];
+export abstract class MoveStrategy {
+  abstract isLegalMove(from: CellPosition, to: CellPosition, board: BoardCell[][]): boolean
 
-export const INITIAL_PIECES_SETUP: { [row: number]: Piece[] } = {
-  0: backrank.map(name => new Piece(Color.BLACK, name)),
-  1: Array(8).fill(null).map(() => new Piece(Color.BLACK, PieceName.PAWN)),
-  6: Array(8).fill(null).map(() => new Piece(Color.WHITE, PieceName.PAWN)),
-  7: backrank.map(name => new Piece(Color.WHITE, name))
+  protected validateInitially(move: CellPosition, color: Color, board: BoardCell[][]): boolean {
+    const cell = board[move.row][move.col]
+
+    if (!cell.piece) return true
+    if (cell.piece.color !== color) return true
+
+    return false
+  }
 }

@@ -24,14 +24,12 @@ export class BoardcellComponent {
 
   getCellStyle(cell: BoardCell) {
     const color = cell.isLight ? this.themeService.lightColor : this.themeService.darkColor
-    let backgroundColor;
 
-    if (cell.isClicked)
-      backgroundColor = this.themeService.markClicked(color);
-    else backgroundColor = color
+    let backgroundColor
+      = cell.isClicked ? this.themeService.markClicked(color)
+        : cell.isLastMove ? this.themeService.markLastMove(color) : color
 
-    if (cell.isLastMove)
-      backgroundColor = this.themeService.markLastMove(color);
+    if (cell.isLegal) backgroundColor = this.themeService.markLegal(color)
 
     return {
       'background-color': backgroundColor
