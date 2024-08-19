@@ -1,3 +1,29 @@
+import { CellPosition } from '@shared/position';
 import { Piece } from './piece.model';
+import { Color } from '@shared/color';
+import { PieceName } from '@shared/piecename';
+import { QueenMove } from './move-validation';
 
-export class Queen extends Piece {}
+export class Queen extends Piece {
+  constructor(color: Color) {
+    super(color, PieceName.QUEEN, new QueenMove());
+
+    this.directions = [
+      // rook directions
+      { row: 1, col: 0 },
+      { row: -1, col: 0 },
+      { row: 0, col: 1 },
+      { row: 0, col: -1 },
+
+      // bishop directions
+      { row: 1, col: 1 },
+      { row: 1, col: -1 },
+      { row: -1, col: 1 },
+      { row: -1, col: -1 },
+    ];
+  }
+
+  override calculatePossibleMoves(position: CellPosition): CellPosition[] {
+    return this.calculateMultiSteps(position);
+  }
+}
