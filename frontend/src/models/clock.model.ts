@@ -2,7 +2,7 @@ export class Clock {
   hours: number;
   minutes: number;
   seconds: number;
-  private interval: any = null
+  private interval: any = null;
   private _isActive: boolean = false;
 
   constructor(minutes: number, seconds: number = 0, hours: number = 0) {
@@ -13,15 +13,14 @@ export class Clock {
   }
 
   activate() {
-    this._isActive = true
+    this._isActive = true;
     this.startClock();
   }
 
   deactivate() {
-    this._isActive = false
+    this._isActive = false;
     this.stopClock();
   }
-
 
   increment(seconds: number) {
     this.seconds += seconds;

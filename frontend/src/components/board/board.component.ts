@@ -1,6 +1,6 @@
 import { Component, inject, OnInit } from '@angular/core';
-import { BoardcellComponent } from "../boardcell/boardcell.component";
-import { BoardCell } from "@models/cell.model";
+import { BoardcellComponent } from '../boardcell/boardcell.component';
+import { BoardCell } from '@models/cell.model';
 import { BoardService } from '@services/board.service';
 
 @Component({
@@ -8,16 +8,17 @@ import { BoardService } from '@services/board.service';
   standalone: true,
   imports: [BoardcellComponent],
   templateUrl: './board.component.html',
-  styleUrl: './board.component.css'
+  styleUrl: './board.component.css',
 })
 export class BoardComponent implements OnInit {
   board: BoardCell[][] = [];
 
-  private boardService = inject(BoardService)
-
+  private boardService = inject(BoardService);
 
   ngOnInit(): void {
-    this.board = this.boardService.board
-    this.boardService.movement$.subscribe((newBoard: BoardCell[][]) => this.board = newBoard);
+    this.board = this.boardService.board;
+    this.boardService.movement$.subscribe(
+      (newBoard: BoardCell[][]) => (this.board = newBoard),
+    );
   }
 }

@@ -18,7 +18,7 @@ export class BoardService {
 
   private _currentPlayer: WritableSignal<Player> = signal(Player.WHITE);
 
-  private legalMovesOfSrc: CellPosition[] = []
+  private legalMovesOfSrc: CellPosition[] = [];
 
   constructor() {
     this._board = this.initBoard();
@@ -26,11 +26,11 @@ export class BoardService {
     this.boardSubject.next(this._board); // Emit the initial board state
 
     effect(() => {
-      this._board.forEach((row) =>
+      this._board.forEach(row =>
         row.forEach(
-          (cell) =>
-          (cell.isClickable =
-            cell.piece?.color.toString() == this._currentPlayer()),
+          cell =>
+            (cell.isClickable =
+              cell.piece?.color.toString() == this._currentPlayer()),
         ),
       );
     });
@@ -62,9 +62,13 @@ export class BoardService {
       if (cell.piece && cell.isClickable) {
         this.isMovementStarted = true; // Start a move
         this.src = cell;
-        this.legalMovesOfSrc = cell.piece.calculatePossibleMoves(cell.position).filter(move => cell.piece!.validate(cell.position, move, this._board));
+        this.legalMovesOfSrc = cell.piece
+          .calculatePossibleMoves(cell.position)
+          .filter(move =>
+            cell.piece!.validate(cell.position, move, this._board),
+          );
 
-        this.legalMovesOfSrc.forEach((move) => {
+        this.legalMovesOfSrc.forEach(move => {
           const { row, col } = move;
 
           this.board[row][col].isLegal = true;
@@ -76,13 +80,12 @@ export class BoardService {
       if (this.src && this.dest && this.src !== this.dest) {
         const isLegalMove = this.legalMovesOfSrc.some(move => {
           const pos = this.dest!.position;
-          return move.row === pos.row && move.col === pos.col
-        }
-        );
+          return move.row === pos.row && move.col === pos.col;
+        });
 
         if (isLegalMove) {
           this.processMove();
-          this._currentPlayer.update((curr) =>
+          this._currentPlayer.update(curr =>
             curr === Player.WHITE ? Player.BLACK : Player.WHITE,
           );
         }
@@ -92,8 +95,8 @@ export class BoardService {
       this.src = null;
       this.dest = null;
       this.isMovementStarted = false; // End the move
-      this._board.forEach((row) =>
-        row.forEach((cell) => {
+      this._board.forEach(row =>
+        row.forEach(cell => {
           cell.isClicked && cell.click();
           cell.isLegal = false;
         }),
@@ -103,16 +106,14 @@ export class BoardService {
 
   private processMove(): void {
     // Reset last move
-    this._board.forEach((row) =>
-      row.forEach((cell) => (cell.isLastMove = false)),
-    );
+    this._board.forEach(row => row.forEach(cell => (cell.isLastMove = false)));
 
     this.src!.piece!.applyConstrains();
 
     const srcPos = this.src!.position;
     const destPos = this.dest!.position;
 
-    const newBoard = this._board.map((row) => row.slice());
+    const newBoard = this._board.map(row => row.slice());
     newBoard[destPos.row][destPos.col].piece = this.src!.piece;
     newBoard[srcPos.row][srcPos.col].piece = undefined;
 

@@ -8,13 +8,13 @@ import { ClockService } from '@services/clock.service';
   standalone: true,
   imports: [NgClass],
   templateUrl: './clock.component.html',
-  styleUrl: './clock.component.css'
+  styleUrl: './clock.component.css',
 })
 export class ClockComponent implements OnInit {
   @Input({ required: true })
-  player!: string
+  player!: string;
 
-  private clockService = inject(ClockService)
+  private clockService = inject(ClockService);
   private clock!: Clock;
 
   ngOnInit(): void {
@@ -22,14 +22,14 @@ export class ClockComponent implements OnInit {
   }
 
   get isActive(): boolean {
-    return this.clock.isActive
+    return this.clock.isActive;
   }
 
   get isTimeUp() {
-    return this.clock.isTimeUp
+    return this.clock.isTimeUp;
   }
 
   get time() {
-    return this.clock.time
+    return this.clock.time;
   }
 }

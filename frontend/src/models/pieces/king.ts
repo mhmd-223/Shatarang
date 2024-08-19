@@ -1,3 +1,3 @@
-import { Piece } from "./piece.model";
+import { Piece } from './piece.model';
 
-export class King extends Piece { }
+export class King extends Piece {}

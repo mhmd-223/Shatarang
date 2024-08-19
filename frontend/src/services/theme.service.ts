@@ -3,26 +3,24 @@ import { THEMES } from '../../public/themes';
 import { BoardCell } from '@models/cell.model';
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class ThemeService {
   private THEME_KEY = 'themeName';
   private PIECES_KEY = 'pieces';
-  private currentTheme!: string
-  private currentPieces!: string
-
+  private currentTheme!: string;
+  private currentPieces!: string;
 
   constructor() {
-    this.loadTheme()
+    this.loadTheme();
   }
 
-
   get lightColor() {
-    return THEMES[this.currentTheme].light
+    return THEMES[this.currentTheme].light;
   }
 
   get darkColor() {
-    return THEMES[this.currentTheme].dark
+    return THEMES[this.currentTheme].dark;
   }
 
   changeTheme(themeName: string) {
@@ -36,15 +34,15 @@ export class ThemeService {
   }
 
   markClicked(color: string) {
-    return `color-mix(in srgb, ${color}, rgba(0, 100, 0, 0.8))`
+    return `color-mix(in srgb, ${color}, rgba(0, 100, 0, 0.8))`;
   }
 
   markLastMove(color: string) {
-    return `color-mix(in srgb, ${color}, rgba(127, 127, 0, 0.8))`
+    return `color-mix(in srgb, ${color}, rgba(127, 127, 0, 0.8))`;
   }
 
   markLegal(color: string) {
-    return `color-mix(in srgb, ${color}, rgba(0, 0, 100, 0.5))`
+    return `color-mix(in srgb, ${color}, rgba(0, 0, 100, 0.5))`;
   }
 
   getPiecePath(cell: BoardCell) {
@@ -52,7 +50,7 @@ export class ThemeService {
     const color = cell.piece?.color ?? 'w';
     const name = cell.piece?.name ?? 'pawn';
 
-    return `${path}/${color}-${name}.svg`
+    return `${path}/${color}-${name}.svg`;
   }
 
   private loadTheme() {

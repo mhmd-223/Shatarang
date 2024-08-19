@@ -1,5 +1,5 @@
-import { CellPosition } from "@shared/position";
-import { Piece } from "./pieces/piece.model";
+import { CellPosition } from '@shared/position';
+import { Piece } from './pieces/piece.model';
 
 export class BoardCell {
   private _isClicked: boolean = false;
@@ -11,7 +11,7 @@ export class BoardCell {
     public isLight: boolean,
     public position: CellPosition,
     public piece?: Piece,
-  ) { }
+  ) {}
 
   get isClicked() {
     return this._isClicked;

@@ -9,37 +9,39 @@ import { ThemeService } from '@services/theme.service';
   standalone: true,
   imports: [NgClass, NgStyle],
   templateUrl: './boardcell.component.html',
-  styleUrl: './boardcell.component.css'
+  styleUrl: './boardcell.component.css',
 })
 export class BoardcellComponent {
   @Input({ required: true })
   cell!: BoardCell;
 
-  private boardService = inject(BoardService)
-  private themeService = inject(ThemeService)
+  private boardService = inject(BoardService);
+  private themeService = inject(ThemeService);
 
   getPiecePath(cell: BoardCell) {
     return this.themeService.getPiecePath(cell);
   }
 
   getCellStyle(cell: BoardCell) {
-    const color = cell.isLight ? this.themeService.lightColor : this.themeService.darkColor
+    const color =
+      cell.isLight ? this.themeService.lightColor : this.themeService.darkColor;
 
-    let backgroundColor
-      = cell.isClicked ? this.themeService.markClicked(color)
-        : cell.isLastMove ? this.themeService.markLastMove(color) : color
+    let backgroundColor =
+      cell.isClicked ? this.themeService.markClicked(color)
+      : cell.isLastMove ? this.themeService.markLastMove(color)
+      : color;
 
-    if (cell.isLegal) backgroundColor = this.themeService.markLegal(color)
+    if (cell.isLegal) backgroundColor = this.themeService.markLegal(color);
 
     return {
-      'background-color': backgroundColor
-    }
+      'background-color': backgroundColor,
+    };
   }
 
   onClick() {
     if (this.cell.piece && this.cell.isClickable) {
       this.cell.click();
     }
-    this.boardService.clickCell(this.cell)
+    this.boardService.clickCell(this.cell);
   }
 }

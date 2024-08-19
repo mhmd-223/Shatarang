@@ -1,4 +1,4 @@
 export interface CellPosition {
-  row: number,
-  col: number
+  row: number;
+  col: number;
 }
