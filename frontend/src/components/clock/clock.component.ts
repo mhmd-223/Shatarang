@@ -1,7 +1,6 @@
 import { NgClass } from '@angular/common';
-import { Component, inject, Input, OnInit } from '@angular/core';
+import { Component, Input } from '@angular/core';
 import { Clock } from '@models/clock.model';
-import { ClockService } from '@services/clock.service';
 
 @Component({
   selector: 'app-clock',
@@ -10,16 +9,9 @@ import { ClockService } from '@services/clock.service';
   templateUrl: './clock.component.html',
   styleUrl: './clock.component.css',
 })
-export class ClockComponent implements OnInit {
+export class ClockComponent {
   @Input({ required: true })
-  player!: string;
-
-  private clockService = inject(ClockService);
-  private clock!: Clock;
-
-  ngOnInit(): void {
-    this.clock = this.clockService.getClock(this.player);
-  }
+  clock!: Clock;
 
   get isActive(): boolean {
     return this.clock.isActive;
