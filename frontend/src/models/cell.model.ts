@@ -6,6 +6,7 @@ export class BoardCell {
   private _isLastMove: boolean = false;
   private _isClickable: boolean = true;
   private _isLegal: boolean = false;
+  private _isChecked: boolean = false;
 
   constructor(
     public isLight: boolean,
@@ -43,5 +44,17 @@ export class BoardCell {
 
   set isLegal(value: boolean) {
     this._isLegal = value;
+  }
+
+  clone(): BoardCell {
+    return new BoardCell(this.isLight, this.position, this.piece);
+  }
+
+  get isChecked(): boolean {
+    return this._isChecked;
+  }
+
+  set isChecked(value: boolean) {
+    this._isChecked = value;
   }
 }

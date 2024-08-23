@@ -1,6 +1,7 @@
 import { BoardCell } from '@models/cell.model';
 import { Color } from '@shared/color';
 import { CellPosition } from '@shared/position';
+import { Utils } from '@shared/utils';
 
 export abstract class Move {
   abstract isLegalMove(
@@ -21,6 +22,10 @@ export abstract class Move {
     if (targetCell.piece.color !== color) return true;
 
     return false;
+  }
+
+  isKingInCheck(board: BoardCell[][], color: Color): boolean {
+    return Utils.isKingInCheck(board, color).isCheck;
   }
 }
 

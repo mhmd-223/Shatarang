@@ -69,6 +69,21 @@ export abstract class Piece {
     to: CellPosition,
     board: BoardCell[][],
   ): boolean {
+    if (!this.basicValidate(from, to, board)) return false;
+
+    // Move the piece
+    const boardCopy = board.map(row => row.map(cell => cell.clone()));
+    boardCopy[to.row][to.col].piece = boardCopy[from.row][from.col].piece;
+    boardCopy[from.row][from.col].piece = undefined;
+
+    return !this.moveValidator.isKingInCheck(boardCopy, this.color);
+  }
+
+  basicValidate(
+    from: CellPosition,
+    to: CellPosition,
+    board: BoardCell[][],
+  ): boolean {
     return this.moveValidator.isLegalMove(from, to, board);
   }
 }

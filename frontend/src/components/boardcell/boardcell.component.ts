@@ -26,12 +26,20 @@ export class BoardcellComponent {
     const color =
       cell.isLight ? this.themeService.lightColor : this.themeService.darkColor;
 
-    let backgroundColor =
-      cell.isClicked ? this.themeService.markClicked(color)
-      : cell.isLastMove ? this.themeService.markLastMove(color)
-      : color;
+    let backgroundColor = color;
 
-    if (cell.isLegal) backgroundColor = this.themeService.markLegal(color);
+    if (cell.isClicked) {
+      backgroundColor = this.themeService.markClicked(color);
+    }
+    if (cell.isLastMove) {
+      backgroundColor = this.themeService.markLastMove(color);
+    }
+    if (cell.isLegal) {
+      backgroundColor = this.themeService.markLegal(color);
+    }
+    if (cell.isChecked && cell.piece) {
+      backgroundColor = this.themeService.markChecked();
+    }
 
     return {
       'background-color': backgroundColor,

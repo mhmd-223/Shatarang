@@ -45,6 +45,10 @@ export class ThemeService {
     return `color-mix(in srgb, ${color}, rgba(0, 0, 100, 0.5))`;
   }
 
+  markChecked(): string {
+    return 'rgb(178, 0, 0)';
+  }
+
   getPiecePath(cell: BoardCell) {
     const path = `chess-pieces/${this.currentPieces}`;
     const color = cell.piece?.color ?? 'w';

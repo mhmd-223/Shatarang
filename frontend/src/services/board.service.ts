@@ -4,6 +4,8 @@ import { CellPosition } from '@shared/position';
 import { INITIAL_PIECES_SETUP } from '@shared/setup';
 import { BehaviorSubject } from 'rxjs';
 import { PlayerService } from './player.service';
+import { Utils } from '@shared/utils';
+import { Color } from '@shared/color';
 
 @Injectable({
   providedIn: 'root',
@@ -124,6 +126,25 @@ export class BoardService {
 
     this._board = newBoard;
     this.boardSubject.next(this._board);
+
+    this.updateCheckStatus();
   }
 
+  private updateCheckStatus() {
+    const updateKingCheckStatus = (result: {
+      isCheck: boolean;
+      kingPosition: CellPosition;
+    }) => {
+      const { isCheck, kingPosition } = result;
+      this._board[kingPosition.row][kingPosition.col].isChecked = isCheck;
+    };
+
+    const whiteCheckResult = Utils.isKingInCheck(this._board, Color.WHITE);
+    updateKingCheckStatus(whiteCheckResult);
+    if (whiteCheckResult.isCheckmate) console.log('Checkmate! White wins!');
+
+    const blackCheckResult = Utils.isKingInCheck(this._board, Color.BLACK);
+    updateKingCheckStatus(blackCheckResult);
+    if (blackCheckResult.isCheckmate) console.log('Checkmate! Black wins!');
+  }
 }
