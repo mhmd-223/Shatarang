@@ -1,15 +1,15 @@
 export const THEMES: { [themeName: string]: Theme } = {
-  'brown': {
+  brown: {
     light: '#f0dab5',
-    dark: '#b58763'
+    dark: '#b58763',
   },
-  'classic': {
+  classic: {
     light: '#fff',
-    dark: '#404040'
-  }
-}
+    dark: '#707070',
+  },
+};
 
 interface Theme {
-  light: string,
-  dark: string
+  light: string;
+  dark: string;
 }

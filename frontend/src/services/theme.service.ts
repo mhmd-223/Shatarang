@@ -42,7 +42,7 @@ export class ThemeService {
   }
 
   markLegal(color: string) {
-    return `color-mix(in srgb, ${color}, rgba(0, 0, 100, 0.5))`;
+    return `color-mix(in srgb, ${color}, rgba(0, 0, 100, 0.7))`;
   }
 
   markChecked(): string {
