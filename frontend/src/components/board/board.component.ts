@@ -17,7 +17,7 @@ export class BoardComponent implements OnInit {
 
   ngOnInit(): void {
     this.board = this.boardService.board;
-    this.boardService.movement$.subscribe(
+    this.boardService.board$.subscribe(
       (newBoard: BoardCell[][]) => (this.board = newBoard),
     );
   }

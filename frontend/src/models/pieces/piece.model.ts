@@ -2,21 +2,25 @@ import { BoardCell } from '@models/cell.model';
 import { Color } from '@shared/color';
 import { PieceName } from '@shared/piecename';
 import { CellPosition } from '@shared/position';
-import { Move } from './move-validation';
+import { MoveValidator } from './move-validation';
 
 export abstract class Piece {
   protected directions: CellPosition[] = [];
   private readonly BOARD_SIZE = 8;
+  private moveCache = new Map<string, CellPosition[]>();
 
   protected constructor(
     public readonly color: Color,
     public readonly name: PieceName,
-    private readonly moveValidator: Move,
+    private readonly moveValidator: MoveValidator,
   ) {}
 
   abstract calculatePossibleMoves(position: CellPosition): CellPosition[];
 
   protected calculateSingleStep(position: CellPosition) {
+    const key = `${position.row},${position.col}`;
+    if (this.moveCache.has(key)) return this.moveCache.get(key)!;
+
     const moves: CellPosition[] = [];
     const { row, col } = position;
 
@@ -27,10 +31,15 @@ export abstract class Piece {
       if (this.isValidPos(move)) moves.push(move);
     });
 
+    this.moveCache.set(key, moves);
+
     return moves;
   }
 
   protected calculateMultiSteps(position: CellPosition) {
+    const key = `${position.row},${position.col}`;
+    if (this.moveCache.has(key)) return this.moveCache.get(key)!;
+
     const moves: CellPosition[] = [];
     const { row, col } = position;
 
@@ -50,6 +59,8 @@ export abstract class Piece {
         };
       }
     });
+
+    this.moveCache.set(key, moves);
 
     return moves;
   }

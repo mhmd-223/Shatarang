@@ -3,7 +3,7 @@ import { Color } from '@shared/color';
 import { CellPosition } from '@shared/position';
 import { Utils } from '@shared/utils';
 
-export abstract class Move {
+export abstract class MoveValidator {
   abstract isLegalMove(
     from: CellPosition,
     to: CellPosition,
@@ -29,7 +29,7 @@ export abstract class Move {
   }
 }
 
-export class PawnMove extends Move {
+export class PawnMove extends MoveValidator {
   isLegalMove(
     from: CellPosition,
     to: CellPosition,
@@ -70,7 +70,7 @@ export class PawnMove extends Move {
   }
 }
 
-export class KnightMove extends Move {
+export class KnightMove extends MoveValidator {
   override isLegalMove(
     from: CellPosition,
     to: CellPosition,
@@ -80,7 +80,7 @@ export class KnightMove extends Move {
   }
 }
 
-export class BishopMove extends Move {
+export class BishopMove extends MoveValidator {
   override isLegalMove(
     from: CellPosition,
     to: CellPosition,
@@ -104,7 +104,7 @@ export class BishopMove extends Move {
   }
 }
 
-export class RookMove extends Move {
+export class RookMove extends MoveValidator {
   override isLegalMove(
     from: CellPosition,
     to: CellPosition,
@@ -145,7 +145,7 @@ export class RookMove extends Move {
   }
 }
 
-export class QueenMove extends Move {
+export class QueenMove extends MoveValidator {
   private bishopMoveValidator = new BishopMove();
   private rookMoveValidator = new RookMove();
 
@@ -173,7 +173,7 @@ export class QueenMove extends Move {
   }
 }
 
-export class KingMove extends Move {
+export class KingMove extends MoveValidator {
   override isLegalMove(
     from: CellPosition,
     to: CellPosition,

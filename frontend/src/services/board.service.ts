@@ -18,6 +18,7 @@ export class BoardService {
 
   private boardSubject = new BehaviorSubject<BoardCell[][]>(this.initBoard());
   movement$ = this.boardSubject.asObservable();
+  board$ = this.boardSubject.asObservable();
 
   private playerService = inject(PlayerService);
 
