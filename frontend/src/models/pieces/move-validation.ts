@@ -1,20 +1,15 @@
-import { BoardCell } from '@models/cell.model';
+import { BoardStateManager } from '@shared/board-state.manager';
 import { Color } from '@shared/color';
 import { CellPosition } from '@shared/position';
 import { Utils } from '@shared/utils';
 
 export abstract class MoveValidator {
-  abstract isLegalMove(
-    from: CellPosition,
-    to: CellPosition,
-    board: BoardCell[][],
-  ): boolean;
+  protected boardStateManager = BoardStateManager.getInstance();
 
-  protected validateGenerally(
-    from: CellPosition,
-    to: CellPosition,
-    board: BoardCell[][],
-  ): boolean {
+  abstract isLegalMove(from: CellPosition, to: CellPosition): boolean;
+
+  protected validateGenerally(from: CellPosition, to: CellPosition): boolean {
+    const board = this.boardStateManager.currentBoard;
     const targetCell = board[to.row][to.col];
     const color = board[from.row][from.col].piece!.color;
 
@@ -24,17 +19,14 @@ export abstract class MoveValidator {
     return false;
   }
 
-  isKingInCheck(board: BoardCell[][], color: Color): boolean {
-    return Utils.isKingInCheck(board, color).isCheck;
+  isKingInCheck(color: Color): boolean {
+    return Utils.isKingInCheck(color).isCheck;
   }
 }
 
 export class PawnMove extends MoveValidator {
-  isLegalMove(
-    from: CellPosition,
-    to: CellPosition,
-    board: BoardCell[][],
-  ): boolean {
+  override isLegalMove(from: CellPosition, to: CellPosition): boolean {
+    const board = this.boardStateManager.currentBoard;
     const color = board[from.row][from.col].piece!.color;
     const targetCell = board[to.row][to.col];
     const rowDiff = to.row - from.row;
@@ -71,23 +63,16 @@ export class PawnMove extends MoveValidator {
 }
 
 export class KnightMove extends MoveValidator {
-  override isLegalMove(
-    from: CellPosition,
-    to: CellPosition,
-    board: BoardCell[][],
-  ): boolean {
-    return this.validateGenerally(from, to, board);
+  override isLegalMove(from: CellPosition, to: CellPosition): boolean {
+    return this.validateGenerally(from, to);
   }
 }
 
 export class BishopMove extends MoveValidator {
-  override isLegalMove(
-    from: CellPosition,
-    to: CellPosition,
-    board: BoardCell[][],
-  ): boolean {
-    if (!this.validateGenerally(from, to, board)) return false;
+  override isLegalMove(from: CellPosition, to: CellPosition): boolean {
+    if (!this.validateGenerally(from, to)) return false;
 
+    const board = this.boardStateManager.currentBoard;
     const rowStep = to.row - from.row > 0 ? 1 : -1;
     const colStep = to.col - from.col > 0 ? 1 : -1;
     let row = from.row + rowStep;
@@ -105,13 +90,10 @@ export class BishopMove extends MoveValidator {
 }
 
 export class RookMove extends MoveValidator {
-  override isLegalMove(
-    from: CellPosition,
-    to: CellPosition,
-    board: BoardCell[][],
-  ): boolean {
-    if (!this.validateGenerally(from, to, board)) return false;
+  override isLegalMove(from: CellPosition, to: CellPosition): boolean {
+    if (!this.validateGenerally(from, to)) return false;
 
+    const board = this.boardStateManager.currentBoard;
     const rowDiff = to.row - from.row;
     const colDiff = to.col - from.col;
 
@@ -149,24 +131,20 @@ export class QueenMove extends MoveValidator {
   private bishopMoveValidator = new BishopMove();
   private rookMoveValidator = new RookMove();
 
-  override isLegalMove(
-    from: CellPosition,
-    to: CellPosition,
-    board: BoardCell[][],
-  ): boolean {
-    if (!this.validateGenerally(from, to, board)) return false;
+  override isLegalMove(from: CellPosition, to: CellPosition): boolean {
+    if (!this.validateGenerally(from, to)) return false;
 
     const rowDiff = to.row - from.row;
     const colDiff = to.col - from.col;
 
     // Check if the move is diagonal (bishop-like)
     if (Math.abs(rowDiff) === Math.abs(colDiff)) {
-      return this.bishopMoveValidator.isLegalMove(from, to, board);
+      return this.bishopMoveValidator.isLegalMove(from, to);
     }
 
     // Check if the move is horizontal or vertical (rook-like)
     if (rowDiff === 0 || colDiff === 0) {
-      return this.rookMoveValidator.isLegalMove(from, to, board);
+      return this.rookMoveValidator.isLegalMove(from, to);
     }
 
     return false;
@@ -174,11 +152,7 @@ export class QueenMove extends MoveValidator {
 }
 
 export class KingMove extends MoveValidator {
-  override isLegalMove(
-    from: CellPosition,
-    to: CellPosition,
-    board: BoardCell[][],
-  ): boolean {
-    return this.validateGenerally(from, to, board);
+  override isLegalMove(from: CellPosition, to: CellPosition): boolean {
+    return this.validateGenerally(from, to);
   }
 }

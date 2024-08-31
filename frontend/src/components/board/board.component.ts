@@ -16,7 +16,6 @@ export class BoardComponent implements OnInit {
   private boardService = inject(BoardService);
 
   ngOnInit(): void {
-    this.board = this.boardService.board;
     this.boardService.board$.subscribe(
       (newBoard: BoardCell[][]) => (this.board = newBoard),
     );

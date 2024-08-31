@@ -1,13 +1,14 @@
-import { BoardCell } from '@models/cell.model';
 import { Color } from '@shared/color';
 import { PieceName } from '@shared/piecename';
 import { CellPosition } from '@shared/position';
 import { MoveValidator } from './move-validation';
+import { BoardStateManager } from '@shared/board-state.manager';
 
 export abstract class Piece {
   protected directions: CellPosition[] = [];
   private readonly BOARD_SIZE = 8;
   private moveCache = new Map<string, CellPosition[]>();
+  private boardStateManager = BoardStateManager.getInstance();
 
   protected constructor(
     public readonly color: Color,
@@ -75,26 +76,17 @@ export abstract class Piece {
 
   applyConstrains() {}
 
-  validate(
-    from: CellPosition,
-    to: CellPosition,
-    board: BoardCell[][],
-  ): boolean {
-    if (!this.basicValidate(from, to, board)) return false;
+  validate(from: CellPosition, to: CellPosition): boolean {
+    if (!this.basicValidate(from, to)) return false;
 
-    // Move the piece
-    const boardCopy = board.map(row => row.map(cell => cell.clone()));
-    boardCopy[to.row][to.col].piece = boardCopy[from.row][from.col].piece;
-    boardCopy[from.row][from.col].piece = undefined;
+    this.boardStateManager.startHypotheticalMove(from, to);
+    const isValid = !this.moveValidator.isKingInCheck(this.color);
+    this.boardStateManager.endHypotheticalMove();
 
-    return !this.moveValidator.isKingInCheck(boardCopy, this.color);
+    return isValid;
   }
 
-  basicValidate(
-    from: CellPosition,
-    to: CellPosition,
-    board: BoardCell[][],
-  ): boolean {
-    return this.moveValidator.isLegalMove(from, to, board);
+  basicValidate(from: CellPosition, to: CellPosition): boolean {
+    return this.moveValidator.isLegalMove(from, to);
   }
 }
