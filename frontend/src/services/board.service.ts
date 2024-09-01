@@ -1,41 +1,20 @@
-import { effect, inject, Injectable } from '@angular/core';
+import { inject, Injectable } from '@angular/core';
 import { BoardCell } from '@models/cell.model';
-import { CellPosition } from '@shared/position';
-import { INITIAL_PIECES_SETUP } from '@shared/setup';
-import { PlayerService } from './player.service';
-import { Utils } from '@shared/utils';
-import { Color } from '@shared/color';
 import { BoardStateManager } from '@shared/board-state.manager';
+import { GameLogicService } from './game-logic.service';
+import { INITIAL_PIECES_SETUP } from '@shared/setup';
+import { CellPosition } from '@shared/position';
 
 @Injectable({
   providedIn: 'root',
 })
 export class BoardService {
-  private boardStateManager: BoardStateManager;
-  private isMovementStarted: boolean = false;
-  private src: BoardCell | null = null;
-  private dest: BoardCell | null = null;
-
-  private playerService = inject(PlayerService);
-
-  private legalMovesOfSrc: CellPosition[] = [];
+  private boardStateManager = BoardStateManager.getInstance();
+  private gameLogicService = inject(GameLogicService);
+  private selectedCell: BoardCell | null = null;
 
   constructor() {
-    this.boardStateManager = BoardStateManager.getInstance();
     this.boardStateManager.updateBoard(this.initBoard());
-
-    effect(() => {
-      const currentBoard = this.boardStateManager.currentBoard;
-      currentBoard.forEach(row =>
-        row.forEach(
-          cell =>
-            (cell.isClickable =
-              cell.piece?.color == this.playerService.currentPlayer.color),
-        ),
-      );
-
-      this.boardStateManager.updateBoard(currentBoard);
-    });
   }
 
   private initBoard(): BoardCell[][] {
@@ -56,107 +35,46 @@ export class BoardService {
   }
 
   clickCell(cell: BoardCell): void {
-    if (!this.isMovementStarted) this.startMove(cell);
-    else this.endMove(cell);
-  }
+    if (!this.selectedCell && cell.isClickable) {
+      // First click: select the cell
+      this.selectedCell = cell;
+      const legalMoves = this.gameLogicService.calculateLegalMoves(
+        cell.position,
+      );
+      this.highlightLegalMoves(legalMoves);
+    } else if (this.selectedCell) {
+      // Second click: attempt to move to the selected cell
+      const from = this.selectedCell.position;
+      const to = cell.position;
+      const moveSuccessful = this.gameLogicService.movePiece(from, to);
 
-  private startMove(cell: BoardCell) {
-    if (cell.piece && cell.isClickable) {
-      this.isMovementStarted = true; // Start a move
-      this.src = cell;
-      this.legalMovesOfSrc = cell.piece
-        .calculatePossibleMoves(cell.position)
-        .filter(move => cell.piece!.validate(cell.position, move));
+      if (moveSuccessful) this.updateLastMoveMarkers(from, to);
 
-      this.legalMovesOfSrc.forEach(move => {
-        const { row, col } = move;
-        const currentBoard = this.boardStateManager.currentBoard;
-
-        currentBoard[row][col].isLegal = true;
-        this.boardStateManager.updateBoard(currentBoard);
-      });
+      this.selectedCell = null;
+      this.clearHighlightedCells();
     }
   }
 
-  private endMove(cell: BoardCell) {
-    if (cell.piece?.color !== this.src?.piece?.color) this.dest = cell;
-
-    if (this.src && this.dest && this.src !== this.dest) {
-      const isLegalMove = this.legalMovesOfSrc.some(move => {
-        const pos = this.dest!.position;
-        return move.row === pos.row && move.col === pos.col;
-      });
-
-      if (isLegalMove) {
-        // Reset last move
-        const currentBoard = this.boardStateManager.currentBoard;
-
-        currentBoard.forEach(row =>
-          row.forEach(cell => (cell.isLastMove = false)),
-        );
-        this.boardStateManager.updateBoard(currentBoard);
-
-        this.processMove();
-        this.playerService.changePlayer();
-      }
-    }
-
-    this.resetMovementState();
+  private highlightLegalMoves(moves: CellPosition[]): void {
+    moves.forEach(move => {
+      this.boardStateManager.currentBoard[move.row][move.col].isLegal = true;
+    });
   }
 
-  private resetMovementState() {
-    this.src = null;
-    this.dest = null;
-    this.isMovementStarted = false; // End the move
-    const currentBoard = this.boardStateManager.currentBoard;
+  private updateLastMoveMarkers(from: CellPosition, to: CellPosition): void {
+    const board = this.boardStateManager.currentBoard;
 
-    currentBoard.forEach(row =>
+    board.forEach(row => row.forEach(cell => (cell.isLastMove = false)));
+    board[from.row][from.col].isLastMove = true;
+    board[to.row][to.col].isLastMove = true;
+  }
+
+  private clearHighlightedCells(): void {
+    this.boardStateManager.currentBoard.forEach(row =>
       row.forEach(cell => {
-        cell.isClicked && cell.click();
         cell.isLegal = false;
+        cell.isClicked && cell.click();
       }),
     );
-
-    this.boardStateManager.updateBoard(currentBoard);
-  }
-
-  private processMove(): void {
-    this.src!.piece!.applyConstrains();
-
-    const srcPos = this.src!.position;
-    const destPos = this.dest!.position;
-
-    const newBoard = this.boardStateManager.currentBoard.map(row =>
-      row.slice(),
-    );
-    newBoard[destPos.row][destPos.col].piece = this.src!.piece;
-    newBoard[srcPos.row][srcPos.col].piece = undefined;
-
-    newBoard[destPos.row][destPos.col].isLastMove = true;
-    newBoard[srcPos.row][srcPos.col].isLastMove = true;
-
-    this.boardStateManager.updateBoard(newBoard);
-
-    this.updateCheckStatus();
-  }
-
-  private updateCheckStatus() {
-    const updateKingCheckStatus = (result: {
-      isCheck: boolean;
-      kingPosition: CellPosition;
-    }) => {
-      const { isCheck, kingPosition } = result;
-      this.boardStateManager.currentBoard[kingPosition.row][
-        kingPosition.col
-      ].isChecked = isCheck;
-    };
-
-    const whiteCheckResult = Utils.isKingInCheck(Color.WHITE);
-    updateKingCheckStatus(whiteCheckResult);
-    if (whiteCheckResult.isCheckmate) console.log('Checkmate! White wins!');
-
-    const blackCheckResult = Utils.isKingInCheck(Color.BLACK);
-    updateKingCheckStatus(blackCheckResult);
-    if (blackCheckResult.isCheckmate) console.log('Checkmate! Black wins!');
   }
 }
