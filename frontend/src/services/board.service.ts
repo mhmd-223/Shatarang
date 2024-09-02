@@ -4,6 +4,8 @@ import { BoardStateManager } from '@shared/board-state.manager';
 import { GameLogicService } from './game-logic.service';
 import { INITIAL_PIECES_SETUP } from '@shared/setup';
 import { CellPosition } from '@shared/position';
+import { Color } from '@shared/color';
+import { CheckDetector } from './move-validation/check-detector';
 
 @Injectable({
   providedIn: 'root',
@@ -38,17 +40,22 @@ export class BoardService {
     if (!this.selectedCell && cell.isClickable) {
       // First click: select the cell
       this.selectedCell = cell;
-      const legalMoves = this.gameLogicService.calculateLegalMoves(
-        cell.position,
-      );
+      const legalMoves = cell.piece!.calculateLegalMoves(cell.position);
       this.highlightLegalMoves(legalMoves);
     } else if (this.selectedCell) {
       // Second click: attempt to move to the selected cell
       const from = this.selectedCell.position;
       const to = cell.position;
-      const moveSuccessful = this.gameLogicService.movePiece(from, to);
+      const legalMoves = this.selectedCell.piece!.calculateLegalMoves(from);
 
-      if (moveSuccessful) this.updateLastMoveMarkers(from, to);
+      if (legalMoves.some(move => move.row === to.row && move.col === to.col)) {
+        const moveSuccessful = this.gameLogicService.movePiece(from, to);
+
+        if (moveSuccessful) {
+          this.updateLastMoveMarkers(from, to);
+          this.updateCheckStatus();
+        }
+      }
 
       this.selectedCell = null;
       this.clearHighlightedCells();
@@ -76,5 +83,19 @@ export class BoardService {
         cell.isClicked && cell.click();
       }),
     );
+  }
+
+  private updateCheckStatus(): void {
+    const checkDetector = CheckDetector.create();
+    const whiteCheckResult = checkDetector.isKingInCheck(Color.WHITE);
+    const blackCheckResult = checkDetector.isKingInCheck(Color.BLACK);
+    const board = this.boardStateManager.currentBoard;
+
+    board[whiteCheckResult.kingPosition.row][
+      whiteCheckResult.kingPosition.col
+    ].isChecked = whiteCheckResult.isCheck;
+    board[blackCheckResult.kingPosition.row][
+      blackCheckResult.kingPosition.col
+    ].isChecked = blackCheckResult.isCheck;
   }
 }

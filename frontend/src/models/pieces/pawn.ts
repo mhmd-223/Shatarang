@@ -2,7 +2,7 @@ import { Piece } from './piece.model';
 import { Color } from '@shared/color';
 import { PieceName } from '@shared/piecename';
 import { CellPosition } from '@shared/position';
-import { PawnMove } from './move-validation';
+import { PawnMove } from '@services/move-validation/move-validator';
 
 export class Pawn extends Piece {
   constructor(color: Color) {
@@ -23,6 +23,6 @@ export class Pawn extends Piece {
   }
 
   override calculatePossibleMoves(position: CellPosition): CellPosition[] {
-    return this.calculateSingleStep(position);
+    return this.calculateMoves(position, 1);
   }
 }

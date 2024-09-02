@@ -44,4 +44,9 @@ export class BoardStateManager {
   endHypotheticalMove(): void {
     this.hypotheticalBoard = null;
   }
+
+  higlightKingInCheck(kingPosition: CellPosition): void {
+    const { row, col } = kingPosition;
+    this.currentBoard[row][col].isChecked = true;
+  }
 }

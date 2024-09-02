@@ -1,45 +1,47 @@
 import { Color } from '@shared/color';
 import { PieceName } from '@shared/piecename';
 import { CellPosition } from '@shared/position';
-import { MoveValidator } from './move-validation';
+import { MoveValidator } from '@services/move-validation/move-validator';
 import { BoardStateManager } from '@shared/board-state.manager';
+import { Utils } from '@shared/utils';
 
 export abstract class Piece {
   protected directions: CellPosition[] = [];
-  private readonly BOARD_SIZE = 8;
-  private moveCache = new Map<string, CellPosition[]>();
   private boardStateManager = BoardStateManager.getInstance();
+  private calculatedMovesCache = new Map<string, CellPosition[]>();
+  private legalMovesCache = new Map<string, CellPosition[]>();
 
   protected constructor(
     public readonly color: Color,
     public readonly name: PieceName,
     private readonly moveValidator: MoveValidator,
-  ) {}
+  ) {
+    this.boardStateManager.boardObservable.subscribe(_ =>
+      this.legalMovesCache.clear(),
+    );
+  }
 
-  abstract calculatePossibleMoves(position: CellPosition): CellPosition[];
-
-  protected calculateSingleStep(position: CellPosition) {
+  calculateLegalMoves(position: CellPosition): CellPosition[] {
     const key = `${position.row},${position.col}`;
-    if (this.moveCache.has(key)) return this.moveCache.get(key)!;
+    if (this.legalMovesCache.has(key)) return this.legalMovesCache.get(key)!;
 
-    const moves: CellPosition[] = [];
-    const { row, col } = position;
+    const moves = this.calculatePossibleMoves(position).filter(move =>
+      this.validate(position, move),
+    );
 
-    this.directions.forEach(direction => {
-      const { row: dRow, col: dCol } = direction;
-      const move = { row: row + dRow, col: col + dCol };
-
-      if (this.isValidPos(move)) moves.push(move);
-    });
-
-    this.moveCache.set(key, moves);
+    this.legalMovesCache.set(key, moves);
 
     return moves;
   }
 
-  protected calculateMultiSteps(position: CellPosition) {
+  protected abstract calculatePossibleMoves(
+    position: CellPosition,
+  ): CellPosition[];
+
+  protected calculateMoves(position: CellPosition, maxStep: number = Infinity) {
     const key = `${position.row},${position.col}`;
-    if (this.moveCache.has(key)) return this.moveCache.get(key)!;
+    if (this.calculatedMovesCache.has(key))
+      return this.calculatedMovesCache.get(key)!;
 
     const moves: CellPosition[] = [];
     const { row, col } = position;
@@ -51,7 +53,7 @@ export abstract class Piece {
         col: col + direction.col * step,
       };
 
-      while (this.isValidPos(move)) {
+      while (this.isValidPos(move) && step <= maxStep) {
         moves.push(move);
         step++;
         move = {
@@ -61,32 +63,18 @@ export abstract class Piece {
       }
     });
 
-    this.moveCache.set(key, moves);
+    this.calculatedMovesCache.set(key, moves);
 
     return moves;
   }
 
-  protected isValidPos(pos: CellPosition) {
-    const { row, col } = pos;
-
-    return (
-      row >= 0 && row < this.BOARD_SIZE && col >= 0 && col < this.BOARD_SIZE
-    );
+  private isValidPos(pos: CellPosition) {
+    return Utils.isWithinBounds(pos.row, pos.col);
   }
 
   applyConstrains() {}
 
-  validate(from: CellPosition, to: CellPosition): boolean {
-    if (!this.basicValidate(from, to)) return false;
-
-    this.boardStateManager.startHypotheticalMove(from, to);
-    const isValid = !this.moveValidator.isKingInCheck(this.color);
-    this.boardStateManager.endHypotheticalMove();
-
-    return isValid;
-  }
-
-  basicValidate(from: CellPosition, to: CellPosition): boolean {
+  private validate(from: CellPosition, to: CellPosition): boolean {
     return this.moveValidator.isLegalMove(from, to);
   }
 }

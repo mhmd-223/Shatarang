@@ -2,7 +2,7 @@ import { CellPosition } from '@shared/position';
 import { Piece } from './piece.model';
 import { Color } from '@shared/color';
 import { PieceName } from '@shared/piecename';
-import { QueenMove } from './move-validation';
+import { QueenMove } from '@services/move-validation/move-validator';
 
 export class Queen extends Piece {
   constructor(color: Color) {
@@ -24,6 +24,6 @@ export class Queen extends Piece {
   }
 
   override calculatePossibleMoves(position: CellPosition): CellPosition[] {
-    return this.calculateMultiSteps(position);
+    return this.calculateMoves(position);
   }
 }

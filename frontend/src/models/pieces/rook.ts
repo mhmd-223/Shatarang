@@ -2,7 +2,7 @@ import { CellPosition } from '@shared/position';
 import { Piece } from './piece.model';
 import { Color } from '@shared/color';
 import { PieceName } from '@shared/piecename';
-import { RookMove } from './move-validation';
+import { RookMove } from '@services/move-validation/move-validator';
 
 export class Rook extends Piece {
   constructor(color: Color) {
@@ -17,6 +17,6 @@ export class Rook extends Piece {
   }
 
   override calculatePossibleMoves(position: CellPosition): CellPosition[] {
-    return this.calculateMultiSteps(position);
+    return this.calculateMoves(position);
   }
 }
