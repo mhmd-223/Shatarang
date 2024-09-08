@@ -5,7 +5,7 @@ import { GameLogicService } from './game-logic.service';
 import { INITIAL_PIECES_SETUP } from '@shared/setup';
 import { CellPosition } from '@shared/position';
 import { Color } from '@shared/color';
-import { CheckDetector } from './move-validation/check-detector';
+import { CheckDetector } from './move-services/move-validation/check-detector';
 
 @Injectable({
   providedIn: 'root',

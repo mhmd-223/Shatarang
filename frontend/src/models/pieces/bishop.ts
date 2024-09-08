@@ -2,7 +2,7 @@ import { CellPosition } from '@shared/position';
 import { Piece } from './piece.model';
 import { Color } from '@shared/color';
 import { PieceName } from '@shared/piecename';
-import { BishopMove } from '@services/move-validation/move-validator';
+import { BishopMove } from '@services/move-services/move-validation/move-validator';
 
 export class Bishop extends Piece {
   constructor(color: Color) {

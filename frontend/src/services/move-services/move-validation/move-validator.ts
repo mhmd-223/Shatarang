@@ -1,12 +1,13 @@
 import {
   DestinationValidationStep,
   KingSafetyValidationStep,
-} from '@services/move-validation/general-validation-steps';
-import { MoveValidationPipeline } from '@services/move-validation/move-validation-pipeline';
+} from '@services/move-services/move-validation/general-validation-steps';
+import { MoveValidationPipeline } from '@services/move-services/move-validation/move-validation-pipeline';
 import {
+  KingSpecificValidationStep,
   PathClearValidationStep,
   PawnSpecificValidationStep,
-} from '@services/move-validation/piece-specific-validation-steps';
+} from '@services/move-services/move-validation/piece-specific-validation-steps';
 import { BoardStateManager } from '@shared/board-state.manager';
 import { CellPosition } from '@shared/position';
 
@@ -126,20 +127,12 @@ export class QueenMove extends MoveValidator {
 export class KingMove extends MoveValidator {
   constructor() {
     super();
-    // TODO: add King-specific validations like castling
+    this.validationPipeline.addStep(new KingSpecificValidationStep());
   }
 
   override isLegalMove(from: CellPosition, to: CellPosition): boolean {
     const board = this.boardStateManager.currentBoard;
     const piece = board[from.row][from.col].piece!;
-
-    const rowDiff = Math.abs(to.row - from.row);
-    const colDiff = Math.abs(to.col - from.col);
-
-    // King moves one square in any direction
-    const isOneSquareMove = rowDiff <= 1 && colDiff <= 1;
-
-    if (!isOneSquareMove) return false;
 
     return this.validationPipeline.validate(from, to, board, piece.color);
   }

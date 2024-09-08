@@ -2,6 +2,13 @@ import { effect, inject, Injectable } from '@angular/core';
 import { BoardStateManager } from '@shared/board-state.manager';
 import { CellPosition } from '@shared/position';
 import { PlayerService } from './player.service';
+import { MoveExecutorService } from './move-services/move-executor.service';
+import { PostMoveService } from './move-services/post-move/post-move.service';
+import {
+  CastlingEvent,
+  Event,
+  EventType,
+} from './move-services/post-move/events';
 
 @Injectable({
   providedIn: 'root',
@@ -9,6 +16,9 @@ import { PlayerService } from './player.service';
 export class GameLogicService {
   private boardStateManager = BoardStateManager.getInstance();
   private playerService = inject(PlayerService);
+  private moveExecutor = inject(MoveExecutorService);
+  private postMoveService = inject(PostMoveService);
+  private eventHandlers = new Map<EventType, (event: Event) => void>();
 
   constructor() {
     effect(() => {
@@ -19,23 +29,54 @@ export class GameLogicService {
               cell.piece?.color === this.playerService.currentPlayer.color),
         ),
       );
+
+      this.addHandlers();
+      this.postMoveService.postMoveEventObservable.subscribe(event => {
+        const handler = this.eventHandlers.get(event.type);
+        if (handler) [handler(event)];
+      });
     });
   }
 
   movePiece(from: CellPosition, to: CellPosition): boolean {
-    const board = this.boardStateManager.currentBoard.map(row => [...row]);
-    const piece = board[from.row][from.col].piece;
+    const board = this.boardStateManager.currentBoard; // board state before movement
+    const success = this.executeMove(from, to);
 
-    if (!piece) return false;
+    if (success) {
+      this.postMoveService.triggerPostMoveEvent(from, to, board);
+      this.playerService.changePlayer();
+      return true;
+    }
 
-    // Perform the move
-    // piece.applyConstrains();
-    board[to.row][to.col].piece = piece;
-    board[from.row][from.col].piece = undefined;
-    this.boardStateManager.updateBoard(board);
+    return false;
+  }
 
-    this.playerService.changePlayer();
+  private executeMove(from: CellPosition, to: CellPosition): boolean {
+    const board = this.copyBoard();
+    const success = this.moveExecutor.movePiece(from, to, board);
 
-    return true;
+    if (success) {
+      this.boardStateManager.updateBoard(board);
+      return true;
+    }
+
+    return false;
+  }
+
+  private copyBoard() {
+    return this.boardStateManager.currentBoard.map(row =>
+      row.map(cell => cell.clone()),
+    );
+  }
+
+  private addHandlers() {
+    this.eventHandlers.set(EventType.CASTLING, (event: Event) => {
+      const castlingEvent = event as CastlingEvent;
+      this.executeMove(
+        castlingEvent.initialRookPos,
+        castlingEvent.finalRookPos,
+      );
+    });
+    this.eventHandlers.set(EventType.NORMAL_MOVE, () => {});
   }
 }

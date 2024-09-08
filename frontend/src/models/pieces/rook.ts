@@ -2,9 +2,11 @@ import { CellPosition } from '@shared/position';
 import { Piece } from './piece.model';
 import { Color } from '@shared/color';
 import { PieceName } from '@shared/piecename';
-import { RookMove } from '@services/move-validation/move-validator';
+import { RookMove } from '@services/move-services/move-validation/move-validator';
 
 export class Rook extends Piece {
+  private _hasMoved = false;
+
   constructor(color: Color) {
     super(color, PieceName.ROOK, new RookMove());
 
@@ -18,5 +20,13 @@ export class Rook extends Piece {
 
   override calculatePossibleMoves(position: CellPosition): CellPosition[] {
     return this.calculateMoves(position);
+  }
+
+  get hasMoved() {
+    return this._hasMoved;
+  }
+
+  override applyConstrains(): void {
+    this._hasMoved = true;
   }
 }

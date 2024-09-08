@@ -2,7 +2,7 @@ import { CellPosition } from '@shared/position';
 import { Piece } from './piece.model';
 import { Color } from '@shared/color';
 import { PieceName } from '@shared/piecename';
-import { QueenMove } from '@services/move-validation/move-validator';
+import { QueenMove } from '@services/move-services/move-validation/move-validator';
 
 export class Queen extends Piece {
   constructor(color: Color) {

@@ -11,6 +11,8 @@ import { Color } from '@shared/color';
 import { CellPosition } from '@shared/position';
 import { Utils } from '@shared/utils';
 
+// TODO: Refactor this class using visitor pattern
+
 export class CheckDetector {
   private static instance: CheckDetector;
   private boardStateManager = BoardStateManager.getInstance();

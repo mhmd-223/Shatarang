@@ -2,6 +2,10 @@ import { MoveValidationStep } from './move-validation-steps';
 import { CellPosition } from '@shared/position';
 import { Color } from '@shared/color';
 import { BoardCell } from '@models/cell.model';
+import { Rook } from '@models/pieces/rook';
+import { King } from '@models/pieces/king';
+import { KingSafetyValidationStep } from './general-validation-steps';
+import { CheckDetector } from './check-detector';
 
 export class PathClearValidationStep implements MoveValidationStep {
   validate(
@@ -82,5 +86,76 @@ export class PawnSpecificValidationStep implements MoveValidationStep {
     // TODO: implement En Passant and Promotion
 
     return false;
+  }
+}
+
+export class KingSpecificValidationStep implements MoveValidationStep {
+  private readonly kingSafety = new KingSafetyValidationStep();
+
+  validate(
+    from: CellPosition,
+    to: CellPosition,
+    board: BoardCell[][],
+    _: Color,
+  ): boolean {
+    const rowDiff = Math.abs(to.row - from.row);
+    const colDiff = Math.abs(to.col - from.col);
+
+    const isOneSquareMove = rowDiff <= 1 && colDiff <= 1;
+    const isCastlingMove = rowDiff === 0 && colDiff === 2;
+
+    if (isCastlingMove) {
+      return this.validateCastling(from, to, board);
+    }
+
+    return isOneSquareMove;
+  }
+
+  private validateCastling(
+    from: CellPosition,
+    to: CellPosition,
+    board: BoardCell[][],
+  ): boolean {
+    const colDiff = to.col - from.col;
+    const king = board[from.row][from.col].piece as King;
+    const rookCol = colDiff === 2 ? 7 : 0;
+    const rook = board[from.row][rookCol].piece as Rook;
+
+    if (!rook || king.hasMoved || rook.hasMoved) {
+      return false;
+    }
+
+    if (!this.checkCastlingPath(from, to, board, king.color)) {
+      return false;
+    }
+
+    return !CheckDetector.create().isKingInCheck(king.color).isCheck;
+  }
+
+  private checkCastlingPath(
+    from: CellPosition,
+    to: CellPosition,
+    board: BoardCell[][],
+    kingColor: Color,
+  ): boolean {
+    const castlingSide = Math.sign(to.col - from.col);
+    const startCol = from.col + castlingSide;
+    const endCol = castlingSide > 0 ? 7 : 0;
+
+    for (let col = startCol; col !== endCol; col += castlingSide) {
+      if (
+        board[from.row][col].piece ||
+        !this.kingSafety.validate(
+          from,
+          { row: from.row, col },
+          board,
+          kingColor,
+        )
+      ) {
+        return false;
+      }
+    }
+
+    return true;
   }
 }

@@ -1,7 +1,7 @@
 import { Color } from '@shared/color';
 import { PieceName } from '@shared/piecename';
 import { CellPosition } from '@shared/position';
-import { MoveValidator } from '@services/move-validation/move-validator';
+import { MoveValidator } from '@services/move-services/move-validation/move-validator';
 import { BoardStateManager } from '@shared/board-state.manager';
 import { Utils } from '@shared/utils';
 
