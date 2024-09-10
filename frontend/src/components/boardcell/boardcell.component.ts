@@ -19,7 +19,7 @@ export class BoardcellComponent {
   private themeService = inject(ThemeService);
 
   getPiecePath(cell: BoardCell) {
-    return this.themeService.getPiecePath(cell);
+    return this.themeService.getPiecePath(cell.piece);
   }
 
   getCellStyle(cell: BoardCell) {

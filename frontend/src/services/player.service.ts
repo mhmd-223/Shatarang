@@ -29,4 +29,12 @@ export class PlayerService {
   get blackPlayerClock(): Clock {
     return this.blackPlayer.clock;
   }
+
+  get blackPlayerCapturedPieces() {
+    return this.blackPlayer.capturedPieces;
+  }
+
+  get whitePlayerCapturedPieces() {
+    return this.whitePlayer.capturedPieces;
+  }
 }

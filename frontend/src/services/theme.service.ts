@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { THEMES } from '../../public/themes';
 import { BoardCell } from '@models/cell.model';
+import { Piece } from '@models/pieces/piece.model';
 
 @Injectable({
   providedIn: 'root',
@@ -49,10 +50,10 @@ export class ThemeService {
     return 'rgb(178, 0, 0)';
   }
 
-  getPiecePath(cell: BoardCell) {
+  getPiecePath(piece: Piece | undefined) {
     const path = `chess-pieces/${this.currentPieces}`;
-    const color = cell.piece?.color ?? 'w';
-    const name = cell.piece?.name ?? 'pawn';
+    const color = piece?.color ?? 'w';
+    const name = piece?.name ?? 'pawn';
 
     return `${path}/${color}-${name}.svg`;
   }

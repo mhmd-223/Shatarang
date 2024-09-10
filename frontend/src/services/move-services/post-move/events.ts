@@ -1,3 +1,4 @@
+import { Piece } from '@models/pieces/piece.model';
 import { CellPosition } from '@shared/position';
 
 export enum EventType {
@@ -30,5 +31,5 @@ export interface PromotionEvent extends Event {
 
 export interface CaptureEvent extends Event {
   type: EventType.CAPTURE;
-  // TODO: define properties for CaptureEvent
+  caputredPiece: Piece;
 }

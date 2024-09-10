@@ -3,7 +3,7 @@ import { Clock } from './clock.model';
 import { Piece } from './pieces/piece.model';
 
 export abstract class Player {
-  private capturedPieces: Piece[] = [];
+  private _capturedPieces: Piece[] = [];
 
   protected constructor(
     public readonly color: Color,
@@ -11,7 +11,11 @@ export abstract class Player {
   ) {}
 
   capture(enemyPiece: Piece) {
-    this.capturedPieces.push(enemyPiece);
+    this._capturedPieces.push(enemyPiece);
+  }
+
+  get capturedPieces() {
+    return this._capturedPieces;
   }
 }
 

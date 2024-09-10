@@ -4,8 +4,15 @@ import { King } from '@models/pieces/king';
 import { Pawn } from '@models/pieces/pawn';
 import { CellPosition } from '@shared/position';
 import { Subject, Observable } from 'rxjs';
-import { CastlingEvent, EnPassantEvent, Event, EventType } from './events';
+import {
+  CaptureEvent,
+  CastlingEvent,
+  EnPassantEvent,
+  Event,
+  EventType,
+} from './events';
 import { Color } from '@shared/color';
+import { Piece } from '@models/pieces/piece.model';
 
 @Injectable({
   providedIn: 'root',
@@ -39,7 +46,7 @@ export class PostMoveService {
     }
 
     if (targetCellPiece) {
-      // TODO: create and trigger capture event
+      event = this.createCaptureEvent(targetCellPiece);
     }
 
     this.postMoveSubject.next(event);
@@ -78,6 +85,13 @@ export class PostMoveService {
         row: to.row - direction,
         col: to.col,
       },
+    };
+  }
+
+  private createCaptureEvent(targetCellPiece: Piece): CaptureEvent {
+    return {
+      type: EventType.CAPTURE,
+      caputredPiece: targetCellPiece,
     };
   }
 }

@@ -5,6 +5,7 @@ import { PlayerService } from './player.service';
 import { MoveExecutorService } from './move-services/move-executor.service';
 import { PostMoveService } from './move-services/post-move/post-move.service';
 import {
+  CaptureEvent,
   CastlingEvent,
   EnPassantEvent,
   Event,
@@ -92,6 +93,10 @@ export class GameLogicService {
         enPassantEvent.enemyPawnPos,
         enPassantEvent.enemyPawnPos,
       );
+    });
+    this.eventHandlers.set(EventType.CAPTURE, (event: Event) => {
+      const caputreEvent = event as CaptureEvent;
+      this.playerService.currentPlayer.capture(caputreEvent.caputredPiece);
     });
     this.eventHandlers.set(EventType.NORMAL_MOVE, (_: Event) => {});
   }
