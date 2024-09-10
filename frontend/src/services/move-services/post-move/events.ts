@@ -20,7 +20,7 @@ export interface CastlingEvent extends Event {
 
 export interface EnPassantEvent extends Event {
   type: EventType.EN_PASSANT;
-  // TODO: define properties for EnPassantEvent
+  enemyPawnPos: CellPosition;
 }
 
 export interface PromotionEvent extends Event {

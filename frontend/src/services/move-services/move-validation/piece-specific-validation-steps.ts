@@ -6,6 +6,8 @@ import { Rook } from '@models/pieces/rook';
 import { King } from '@models/pieces/king';
 import { KingSafetyValidationStep } from './general-validation-steps';
 import { CheckDetector } from './check-detector';
+import { Pawn } from '@models/pieces/pawn';
+import { Utils } from '@shared/utils';
 
 export class PathClearValidationStep implements MoveValidationStep {
   validate(
@@ -75,15 +77,25 @@ export class PawnSpecificValidationStep implements MoveValidationStep {
     }
 
     // Diagonal capture
-    if (
-      Math.abs(colDiff) === 1 &&
-      rowDiff === direction &&
-      isCellOccupied(targetCell) &&
-      targetCell.piece!.color !== pawnColor
-    )
-      return true;
+    if (Math.abs(colDiff) === 1 && rowDiff === direction) {
+      if (isCellOccupied(targetCell) && targetCell.piece!.color !== pawnColor)
+        return true;
 
-    // TODO: implement En Passant and Promotion
+      // Maybe an en-passant move
+      if (!isCellOccupied(targetCell)) {
+        const enemyPawnCell = board[to.row - direction][to.col];
+
+        return (
+          isCellOccupied(enemyPawnCell) &&
+          enemyPawnCell.piece instanceof Pawn &&
+          enemyPawnCell.piece.color !== pawnColor &&
+          Utils.enPassantState !== null &&
+          Utils.enPassantState.pawn === enemyPawnCell.piece
+        );
+      }
+    }
+
+    // TODO: implement Promotion
 
     return false;
   }

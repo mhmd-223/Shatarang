@@ -6,9 +6,11 @@ import { MoveExecutorService } from './move-services/move-executor.service';
 import { PostMoveService } from './move-services/post-move/post-move.service';
 import {
   CastlingEvent,
+  EnPassantEvent,
   Event,
   EventType,
 } from './move-services/post-move/events';
+import { Utils } from '@shared/utils';
 
 @Injectable({
   providedIn: 'root',
@@ -29,16 +31,19 @@ export class GameLogicService {
               cell.piece?.color === this.playerService.currentPlayer.color),
         ),
       );
+    });
 
-      this.addHandlers();
-      this.postMoveService.postMoveEventObservable.subscribe(event => {
-        const handler = this.eventHandlers.get(event.type);
-        if (handler) [handler(event)];
-      });
+    this.addHandlers();
+    this.postMoveService.postMoveEventObservable.subscribe(event => {
+      const handler = this.eventHandlers.get(event.type);
+      if (handler) handler(event);
     });
   }
 
   movePiece(from: CellPosition, to: CellPosition): boolean {
+    // Reset the en passant capture ability
+    Utils.enPassantState = null;
+
     const board = this.boardStateManager.currentBoard; // board state before movement
     const success = this.executeMove(from, to);
 
@@ -77,6 +82,17 @@ export class GameLogicService {
         castlingEvent.finalRookPos,
       );
     });
-    this.eventHandlers.set(EventType.NORMAL_MOVE, () => {});
+    this.eventHandlers.set(EventType.EN_PASSANT, (event: Event) => {
+      const enPassantEvent = event as EnPassantEvent;
+      const { row, col } = enPassantEvent.enemyPawnPos;
+      const enemyPawn = this.boardStateManager.currentBoard[row][col].piece!;
+
+      this.playerService.currentPlayer.capture(enemyPawn);
+      this.executeMove(
+        enPassantEvent.enemyPawnPos,
+        enPassantEvent.enemyPawnPos,
+      );
+    });
+    this.eventHandlers.set(EventType.NORMAL_MOVE, (_: Event) => {});
   }
 }

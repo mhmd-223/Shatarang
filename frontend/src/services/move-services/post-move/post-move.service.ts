@@ -4,7 +4,8 @@ import { King } from '@models/pieces/king';
 import { Pawn } from '@models/pieces/pawn';
 import { CellPosition } from '@shared/position';
 import { Subject, Observable } from 'rxjs';
-import { CastlingEvent, Event, EventType } from './events';
+import { CastlingEvent, EnPassantEvent, Event, EventType } from './events';
+import { Color } from '@shared/color';
 
 @Injectable({
   providedIn: 'root',
@@ -30,7 +31,7 @@ export class PostMoveService {
 
     if (sourceCellPiece instanceof Pawn) {
       if (!targetCellPiece && Math.abs(from.col - to.col) === 1) {
-        // TODO: create and trigger en-passant event
+        event = this.createEnPassantEvent(to, sourceCellPiece.color);
       }
       if (to.row === 0 || to.row === 7) {
         // TODO: create and trigger promotion event
@@ -61,6 +62,21 @@ export class PostMoveService {
       finalRookPos: {
         row: kingPosition.row,
         col: kingPosition.col + (isKingSide ? 1 : -1),
+      },
+    };
+  }
+
+  private createEnPassantEvent(
+    to: CellPosition,
+    pawnColor: Color,
+  ): EnPassantEvent {
+    const direction = pawnColor === Color.WHITE ? -1 : 1;
+
+    return {
+      type: EventType.EN_PASSANT,
+      enemyPawnPos: {
+        row: to.row - direction,
+        col: to.col,
       },
     };
   }
