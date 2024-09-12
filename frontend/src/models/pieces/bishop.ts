@@ -6,7 +6,7 @@ import { BishopMove } from '@services/move-services/move-validation/move-validat
 
 export class Bishop extends Piece {
   constructor(color: Color) {
-    super(color, PieceName.BISHOP, new BishopMove());
+    super(color, PieceName.BISHOP, 3, new BishopMove());
 
     this.directions = [
       { row: 1, col: 1 },

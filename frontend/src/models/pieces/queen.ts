@@ -6,7 +6,7 @@ import { QueenMove } from '@services/move-services/move-validation/move-validato
 
 export class Queen extends Piece {
   constructor(color: Color) {
-    super(color, PieceName.QUEEN, new QueenMove());
+    super(color, PieceName.QUEEN, 9, new QueenMove());
 
     this.directions = [
       // rook directions

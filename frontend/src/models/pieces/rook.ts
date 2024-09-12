@@ -8,7 +8,7 @@ export class Rook extends Piece {
   private _hasMoved = false;
 
   constructor(color: Color) {
-    super(color, PieceName.ROOK, new RookMove());
+    super(color, PieceName.ROOK, 5, new RookMove());
 
     this.directions = [
       { row: 1, col: 0 },

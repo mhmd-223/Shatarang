@@ -5,7 +5,7 @@
       context: {
         clock: playerService.blackPlayerClock,
         pieces: playerService.blackPlayerCapturedPieces,
-        align: 'end',
+        color: 'b',
       }
     "
   >
@@ -48,30 +48,60 @@
       context: {
         clock: playerService.whitePlayerClock,
         pieces: playerService.whitePlayerCapturedPieces,
-        align: 'start',
+        color: 'w',
       }
     "
   >
   </ng-container>
 </div>
 
+@if (isOverlayVisible) {
+  <div class="overlay">
+    <div class="bg-white p-8 rounded-lg shadow-lg flex">
+      @for (piece of promotionPieces; track piece) {
+        <div
+          class="cursor-pointer mx-5 hover:scale-125 duration-150"
+          (click)="onPieceSelected(piece)"
+        >
+          <img
+            [src]="themeService.getPiecePath(piece)"
+            [alt]="piece.name"
+            class="w-10 h-10 md:w-24 md:h-24 object-cover"
+          />
+        </div>
+      }
+    </div>
+  </div>
+}
+
 <ng-template
   #topBotSectionTemp
   let-clock="clock"
   let-pieces="pieces"
-  let-align="align"
+  let-color="color"
 >
   <div class="h-full flex items-center md:h-[10%] lg:h-[1%]">
-    <div [ngClass]="['self-' + align, 'flex my-2 ml-16 md:hidden']">
+    <div
+      [ngClass]="[
+        color === 'w' ? 'self-start' : 'self-end',
+        'flex my-2 ml-14 md:hidden',
+      ]"
+    >
       <app-clock [clock]="clock"></app-clock>
 
       <!-- Captured pieces -->
-      <div class="self-end ml-1 flex flex-wrap">
+      <div
+        [matBadge]="playerService.pointsDiff(color)"
+        matBadgeSize="large"
+        matBadgePosition="above after"
+        matBadgeOverlap="false"
+        class="grid grid-cols-9 ml-2 bg-slate-700 rounded"
+      >
         @for (piece of pieces; track piece) {
           <img
             [src]="themeService.getPiecePath(piece)"
             alt="chessPiece"
-            class="w-5 h-5 -mx-3"
+            class="w-5 h-5 inline"
           />
         }
       </div>
@@ -89,7 +119,12 @@
     @if (color === 'b') {
       <app-clock [clock]="clock"></app-clock>
     }
-    <div class="grid grid-cols-5 my-3">
+    <div
+      [matBadge]="playerService.pointsDiff(color)"
+      matBadgeSize="large"
+      matBadgePosition="before"
+      class="grid grid-cols-5 my-3 bg-slate-700 rounded-lg"
+    >
       @for (piece of pieces; track piece) {
         <img
           [src]="themeService.getPiecePath(piece)"
@@ -97,7 +132,6 @@
           class="w-10 h-10 inline"
         />
       }
-      <!-- TODO: add points difference  -->
     </div>
 
     @if (color === 'w') {

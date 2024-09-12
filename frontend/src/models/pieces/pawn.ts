@@ -6,7 +6,7 @@ import { PawnMove } from '@services/move-services/move-validation/move-validator
 
 export class Pawn extends Piece {
   constructor(color: Color) {
-    super(color, PieceName.PAWN, new PawnMove());
+    super(color, PieceName.PAWN, 1, new PawnMove());
 
     this.directions = [
       { row: 1, col: 0 },

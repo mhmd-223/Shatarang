@@ -8,7 +8,7 @@ export class King extends Piece {
   private _hasMoved = false;
 
   constructor(color: Color) {
-    super(color, PieceName.KING, new KingMove());
+    super(color, PieceName.KING, Infinity, new KingMove());
 
     this.directions = [
       // like queen but only one step

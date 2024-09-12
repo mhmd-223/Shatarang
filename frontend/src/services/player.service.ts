@@ -37,4 +37,14 @@ export class PlayerService {
   get whitePlayerCapturedPieces() {
     return this.whitePlayer.capturedPieces;
   }
+
+  pointsDiff(color: string): string {
+    const whitePoints = this.whitePlayer.capturedPiecesPoints;
+    const blackPoints = this.blackPlayer.capturedPiecesPoints;
+    let diff = whitePoints - blackPoints;
+
+    if (color === 'b') diff = -diff;
+
+    return diff > 0 ? '+' + diff.toString() : '';
+  }
 }

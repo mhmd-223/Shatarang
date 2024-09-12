@@ -4,6 +4,7 @@ import { Piece } from './pieces/piece.model';
 
 export abstract class Player {
   private _capturedPieces: Piece[] = [];
+  private _capturedPiecesPoints: number = 0;
 
   protected constructor(
     public readonly color: Color,
@@ -11,11 +12,16 @@ export abstract class Player {
   ) {}
 
   capture(enemyPiece: Piece) {
+    this._capturedPiecesPoints += enemyPiece.points;
     this._capturedPieces.push(enemyPiece);
   }
 
   get capturedPieces() {
     return this._capturedPieces;
+  }
+
+  get capturedPiecesPoints(): number {
+    return this._capturedPiecesPoints;
   }
 }
 

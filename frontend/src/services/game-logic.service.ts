@@ -10,6 +10,7 @@ import {
   EnPassantEvent,
   Event,
   EventType,
+  PromotionEvent,
 } from './move-services/post-move/events';
 import { Utils } from '@shared/utils';
 
@@ -22,6 +23,7 @@ export class GameLogicService {
   private moveExecutor = inject(MoveExecutorService);
   private postMoveService = inject(PostMoveService);
   private eventHandlers = new Map<EventType, (event: Event) => void>();
+  private promotionPosition: CellPosition | null = null;
 
   constructor() {
     effect(() => {
@@ -38,6 +40,12 @@ export class GameLogicService {
     this.postMoveService.postMoveEventObservable.subscribe(event => {
       const handler = this.eventHandlers.get(event.type);
       if (handler) handler(event);
+    });
+    Utils.promotionPiece$.subscribe(piece => {
+      if (piece && this.promotionPosition) {
+        const { row, col } = this.promotionPosition;
+        this.boardStateManager.currentBoard[row][col].piece = piece;
+      }
     });
   }
 
@@ -97,6 +105,9 @@ export class GameLogicService {
     this.eventHandlers.set(EventType.CAPTURE, (event: Event) => {
       const caputreEvent = event as CaptureEvent;
       this.playerService.currentPlayer.capture(caputreEvent.caputredPiece);
+    });
+    this.eventHandlers.set(EventType.PROMOTION, (event: Event) => {
+      this.promotionPosition = (event as PromotionEvent).promotedPiecePos;
     });
     this.eventHandlers.set(EventType.NORMAL_MOVE, (_: Event) => {});
   }

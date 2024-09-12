@@ -14,6 +14,7 @@ export abstract class Piece {
   protected constructor(
     public readonly color: Color,
     public readonly name: PieceName,
+    public readonly points: number,
     private readonly moveValidator: MoveValidator,
   ) {
     this.boardStateManager.boardObservable.subscribe(_ =>

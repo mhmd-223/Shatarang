@@ -95,8 +95,6 @@ export class PawnSpecificValidationStep implements MoveValidationStep {
       }
     }
 
-    // TODO: implement Promotion
-
     return false;
   }
 }

@@ -1,4 +1,5 @@
 import { Piece } from '@models/pieces/piece.model';
+import { Color } from '@shared/color';
 import { CellPosition } from '@shared/position';
 
 export enum EventType {
@@ -26,7 +27,8 @@ export interface EnPassantEvent extends Event {
 
 export interface PromotionEvent extends Event {
   type: EventType.PROMOTION;
-  // TODO: define properties for PromotionEvent
+  promotedPiecePos: CellPosition;
+  promotedPieceColor: Color;
 }
 
 export interface CaptureEvent extends Event {

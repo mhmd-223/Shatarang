@@ -6,7 +6,7 @@ import { KnightMove } from '@services/move-services/move-validation/move-validat
 
 export class Knight extends Piece {
   constructor(color: Color) {
-    super(color, PieceName.KNIGHT, new KnightMove());
+    super(color, PieceName.KNIGHT, 3, new KnightMove());
 
     this.directions = [
       { row: 2, col: 1 },

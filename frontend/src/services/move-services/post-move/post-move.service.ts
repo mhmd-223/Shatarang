@@ -10,6 +10,7 @@ import {
   EnPassantEvent,
   Event,
   EventType,
+  PromotionEvent,
 } from './events';
 import { Color } from '@shared/color';
 import { Piece } from '@models/pieces/piece.model';
@@ -28,28 +29,38 @@ export class PostMoveService {
     const sourceCellPiece = board[from.row][from.col].piece!;
     const targetCellPiece = board[to.row][to.col].piece;
     let event: Event = { type: EventType.NORMAL_MOVE };
+    let isNormalMove = true;
 
     if (sourceCellPiece instanceof King) {
       const colDiff = to.col - from.col;
       if (Math.abs(colDiff) === 2) {
         event = this.createCastlingEvent(from, colDiff > 0);
+        this.postMoveSubject.next(event);
+        isNormalMove = false;
       }
     }
 
     if (sourceCellPiece instanceof Pawn) {
+      // En passant
       if (!targetCellPiece && Math.abs(from.col - to.col) === 1) {
         event = this.createEnPassantEvent(to, sourceCellPiece.color);
+        this.postMoveSubject.next(event);
       }
+      // Promotion
       if (to.row === 0 || to.row === 7) {
-        // TODO: create and trigger promotion event
+        event = this.createPromotionEvent(to, sourceCellPiece.color);
+        this.postMoveSubject.next(event);
       }
+      isNormalMove = false;
     }
 
     if (targetCellPiece) {
       event = this.createCaptureEvent(targetCellPiece);
+      this.postMoveSubject.next(event);
+      isNormalMove = false;
     }
 
-    this.postMoveSubject.next(event);
+    if (isNormalMove) this.postMoveSubject.next(event); // normal move
   }
 
   get postMoveEventObservable(): Observable<Event> {
@@ -92,6 +103,17 @@ export class PostMoveService {
     return {
       type: EventType.CAPTURE,
       caputredPiece: targetCellPiece,
+    };
+  }
+
+  private createPromotionEvent(
+    promotionCell: CellPosition,
+    pieceColor: Color,
+  ): PromotionEvent {
+    return {
+      type: EventType.PROMOTION,
+      promotedPiecePos: promotionCell,
+      promotedPieceColor: pieceColor,
     };
   }
 }

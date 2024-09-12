@@ -1,6 +1,5 @@
 import { Injectable } from '@angular/core';
 import { THEMES } from '../../public/themes';
-import { BoardCell } from '@models/cell.model';
 import { Piece } from '@models/pieces/piece.model';
 
 @Injectable({
