@@ -12,6 +12,10 @@ export class PlayerService {
     this.whitePlayer,
   );
 
+  // Initial material points
+  private whitePointsTotal = 39;
+  private blackPointsTotal = 39;
+
   get currentPlayer(): Player {
     return this.currentPlayerSignal();
   }
@@ -39,12 +43,19 @@ export class PlayerService {
   }
 
   pointsDiff(color: string): string {
-    const whitePoints = this.whitePlayer.capturedPiecesPoints;
-    const blackPoints = this.blackPlayer.capturedPiecesPoints;
+    const whitePoints =
+      this.whitePlayer.capturedPiecesPoints + this.whitePointsTotal;
+    const blackPoints =
+      this.blackPlayer.capturedPiecesPoints + this.blackPointsTotal;
     let diff = whitePoints - blackPoints;
 
     if (color === 'b') diff = -diff;
 
     return diff > 0 ? '+' + diff.toString() : '';
+  }
+
+  promote(points: number, color: string) {
+    if (color === 'w') this.whitePointsTotal += points;
+    else this.blackPointsTotal += points;
   }
 }

@@ -78,6 +78,7 @@ export class AppComponent {
 
   onPieceSelected(piece: Piece) {
     Utils.promotionPiece$.next(piece);
+    this.playerService.promote(piece.points - 1, piece.color); // Subtract one pawn
     this.isOverlayVisible = false;
     this.isPromotionEventActive.set(false);
   }
